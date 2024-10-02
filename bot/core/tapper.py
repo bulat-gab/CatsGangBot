@@ -74,13 +74,12 @@ class Tapper:
                     logger.info(f"{self.session_name} | Sleep {fls}s")
                     await asyncio.sleep(fls + 3)
             
-            ref_id = random.choices([settings.REF_ID, "BBbpkhoDpCz4-1wY-ZHVs"], weights=[85, 15], k=1)[0]
             web_view = await self.tg_client.invoke(RequestAppWebView(
                 peer=peer,
                 app=InputBotAppShortName(bot_id=peer, short_name="join"),
                 platform='android',
                 write_allowed=True,
-                start_param=ref_id
+                start_param=settings.REF_ID
             ))
 
             auth_url = web_view.url
@@ -92,7 +91,7 @@ class Tapper:
             if self.tg_client.is_connected:
                 await self.tg_client.disconnect()
 
-            return ref_id, tg_web_data
+            return settings.REF_ID, tg_web_data
 
         except InvalidSession as error:
             raise error
@@ -263,6 +262,7 @@ class Tapper:
                         reward = task.get('rewardPoints')
                         type_=('check' if type == 'SUBSCRIBE_TO_CHANNEL' else 'complete')
                         done_task = await self.done_tasks(http_client=http_client, task_id=id, type_=type_)
+                        await asyncio.sleep(random.randint(1, 3))
                         if done_task and (done_task.get('success', False) or done_task.get('completed', False)):
                             logger.info(f"{self.session_name} | Task <y>{title}</y> done! Reward: {reward}")
                 else:
